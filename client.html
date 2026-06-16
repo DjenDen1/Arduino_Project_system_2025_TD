@@ -1,0 +1,77 @@
+<!DOCTYPE lang="ru">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Мониторинг Датчиков Raspberry Pi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 300px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .param {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+        .value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Показания с системы Arduino</h2>
+        <div class="param">LM75A: <span id="lmtemp" class="value">0.0</span> C</div>
+        <div class="param">DHT22: <span id="humidity" class="value">0.0</span> %</div>
+        <div class="param">BMP280: <span id="pressure" class="value">0.0</span> hPa</div>
+    </div>
+
+    <script>
+        async function updateData() {
+            try {
+                const response = await fetch('/get_data');
+                
+                if (response.ok) {
+                    const json = await response.json();
+                    
+                    document.getElementById('lmtemp').innerText = json.lmtemp;
+                    document.getElementById('humidity').innerText = json.humidity;
+                    document.getElementById('pressure').innerText = json.pressure;
+                } else {
+                    console.error("Сервер ответил с ошибкой:", response.status);
+                }
+            } catch (error) {
+                console.error("Ошибка сети или парсинга:", error);
+            }
+        }
+
+        setInterval(updateData, 1000);
+        
+        updateData();
+    </script>
+
+</body>
+</html>
